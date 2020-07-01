@@ -1,0 +1,237 @@
+
+
+<script src="https://test-tyro.mtf.gateway.mastercard.com/form/version/56/merchant/TYRO_318/session.js"></script>
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+
+<!-- CREATE THE HTML FOR THE PAYMENT PAGE -->
+
+                        <div class="form-group">
+                            <label for="cc-number" class="control-label mb-1">Card number</label>
+                         
+                            <input  type="tel" pattern="[0-9\s]{13,19}" autocomplete="cc-number" id="card-number" class="input-field cc-number form-control invalidFieldCharacters" title="card number" aria-label="enter your card number" value="" tabindex="1" readonly>
+                            <div id="card-invalid" class="d-none" role="alert">
+                                    Please enter a valid card
+                            </div>
+                        </div>
+                        <div class="form-group has-success">
+                            <label for="cc-name" class="control-label mb-1">Name on card</label>
+                            <input type="text" id="cardholder-name" class="input-field form-control cc-name" title="cardholder name" aria-label="enter name on card"  tabindex="3" readonly>
+
+                        </div>
+
+                        <div>Expiry Month 
+                                <select id="expiry-month" class="form-control input-md" required="" readonly disabled>
+                                    <option value="">Select Month</option>
+                                    <option value="01">January</option>
+                                    <option value="02">February</option>
+                                    <option value="03">March</option>
+                                    <option value="04">April</option>
+                                    <option value="05">May</option>
+                                    <option value="06">June</option>
+                                    <option value="07">July</option>
+                                    <option value="08">August</option>
+                                    <option value="09">September</option>
+                                    <option value="10">October</option>
+                                    <option value="11">November</option>
+                                    <option value="12">December</option>
+                                </select>
+                                </div>
+
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                    
+                                        
+                            </div>
+
+                          </div>
+                          <div>Expiry Year 
+                                <select id="expiry-year" class="form-control input-md" required="" readonly disabled>
+                                    <option value="">Select Year</option>
+                                    <option>20</option>
+                                    <option>21</option>
+                                    <option>22</option>
+                                    <option>23</option>
+                                    <option>24</option>
+                                    <option>25</option>
+                                    <option>26</option>
+                                    <option>27</option>
+                                    <option>28</option>
+                                    <option>29</option>
+                                    <option>30</option>
+                                </select>
+                                </div>
+                        <div class="row">
+                            
+                            <div class="col-6">
+                                <label class="control-label mb-1">Security code</label>
+                                <div class="input-group">
+                                    <input type="text" id="security-code" class="input-field form-control cc-cvc" title="security code" aria-label="three digit CCV security code" value="" tabindex="4" readonly>
+                                    <div id="cvv-invalid" class="invisible" role="alert">
+                                            Please enter a valid CVV
+                                    </div>
+                                        </div>
+                                    </div>
+                                </div>
+               
+                        
+                        <div>
+                            <button id="payment-button" onclick="updateSession()" class="btn btn-lg btn-info btn-block">
+                                <i class="fa fa-lock fa-lg"></i>&nbsp;
+                                <span id="payment-button-amount">Pay</span>
+                            </button>
+                        </div>
+
+        
+<!-- JAVASCRIPT FRAME-BREAKER CODE TO PROVIDE PROTECTION AGAINST IFRAME CLICK-JACKING -->
+<script type="text/javascript">
+
+
+var sessions = [];
+
+var cardnumberField = {card: {nameOnCard: "#card-number"}};
+var cardholderNameField = {card: {nameOnCard: "#cardholder-name"}};
+var expiryFields = {card: {expiryMonth: "#expiry-month", expiryYear: "#expiry-year"}}; 
+var cvvField = {card: {securityCode: "#security-code"}};
+
+
+function configureField(sessionId, scope, fields, callback){
+    console.log("configuring these fields: " + JSON.stringify(fields));
+    var configObject = {
+        fields: fields,
+        frameEmbeddingMitigation: ["javascript"],
+        callbacks: {
+ 		    initialized: function(response) {
+                // HANDLE INITIALIZATION RESPONSE
+                console.log("configuration ran: " + JSON.stringify(response));
+            },
+            formSessionUpdate: callback 
+        },
+        interaction: {
+            displayControl: {
+            formatCard: "EMBOSSED",
+            invalidFieldCharacters: "REJECT"
+			 }
+ 		}
+    };
+    if (sessionId.length > 0){
+        configObject.session = sessionId;
+    }
+    console.log("configuring this: " + JSON.stringify(configObject));
+PaymentSession.configure(configObject, scope);
+  }
+
+configureField(11, 'card-number', cardnumberField, cardnumberCallback);
+
+
+var cardnumberCallback = function(response){
+ console.log("card-number update: " + JSON.stringify(response));
+	        // HANDLE RESPONSE FOR UPDATE SESSION
+ 	        if (response.status) {
+   	            if ("ok" == response.status) {
+                    console.log("Session updated with data: " + response.session.id);
+                    var sessionId = response.session.id;
+
+                    if (response.sourceOfFunds.provided.card.number) {
+                        console.log("cardnumber update successful:  " + response);
+                        configureField(sessionId, 'expiry', expiryFields, expiryCallback);
+                        configureField(sessionId, 'cardholder-name', cardholderNameField, cardholderNameCallback);
+                        configureField(sessionId, 'cvv', cvvField, cvvCallback);
+                        document.getElementById("card-invalid").setAttribute("class", "d-none");
+                        document.getElementById("expiry-month").removeAttribute("disabled");
+                        document.getElementById("expiry-year").removeAttribute("disabled");
+                    }
+              
+		
+                //check if the user entered a Mastercard credit card
+		        if (response.sourceOfFunds.provided.card.scheme == 'MASTERCARD') {
+                    console.log("The user entered a Mastercard credit card.")
+                    document.getElementById("card-number").setAttribute("class", "form-control cc-number identified mastercard border-success");
+                }
+                if (response.sourceOfFunds.provided.card.scheme == 'VISA') {
+                    console.log("The user entered a Visa credit card.")
+                    document.getElementById("card-number").setAttribute("class", "form-control cc-number identified visa border-success");
+                }
+                if (response.sourceOfFunds.provided.card.scheme == 'AMEX') {
+                console.log("The user entered a Amex credit card.")
+                document.getElementById("card-number").setAttribute("class", "form-control cc-number identified amex border-success");
+                }
+            } else if ("fields_in_error" == response.status)  {
+                 console.log("Session update failed with field errors.");
+                if (response.errors.cardNumber) {
+                    console.log("Card number invalid or missing.");
+                    document.getElementById("card-invalid").setAttribute("class", "alert alert-danger");
+                    document.getElementById("card-number").setAttribute("class", "form-control cc-number");
+                }
+            } 
+        }
+};
+
+var expiryCallback = function(response){
+    if (response.status) {
+                if ("ok" == response.status) {
+                    console.log("expiry update successful:  " + response);
+                }
+            }
+};
+
+var cardholderNameCallback = function(response){
+    if (response.status) {
+                if ("ok" == response.status) {
+                    console.log("Cardholder update successful:  " + response);
+                }
+            }
+};
+
+var cvvCallback = function(response){
+         console.log("cvv response: " + JSON.stringify(response));
+	// HANDLE RESPONSE FOR UPDATE SESSION
+ 	    if (response.status) {
+   	        if ("ok" == response.status) {
+                console.log("Session updated with data: " + response.session.id);
+                var sessionId = response.session.id;
+                pay(sessionId);
+         
+            }
+        }
+};
+
+  
+
+
+PaymentSession.onBlur(['card.number'], function() {
+     console.log("card.number field changed");
+
+    PaymentSession.updateSessionFromForm("card", undefined,'card-number');
+    //handle change event
+}, 'card-number');
+
+function updateSession() {
+// UPDATE THE SESSION WITH THE INPUT FROM HOSTED FIELDS
+//PaymentSession.updateSessionFromForm('card', undefined,"card-number");
+
+PaymentSession.updateSessionFromForm('card', undefined,"cvv");
+
+
+
+}
+
+
+
+
+function pay(sessionId){
+    var request = new XMLHttpRequest();
+    request.onreadystatechange = function() {
+       
+        if (request.readyState === XMLHttpRequest.DONE && request.status == 200) {
+        window.location.assign(request.responseURL);
+    }
+    }
+  var path = "/tyroHostedSession/checkout_action"; 
+  request.open("POST", path, true);
+  request.setRequestHeader("Content-Type", "application/json; charset=UTF-8");
+  var jsonBody= '{"sessionId":"' + sessionId + '"}';
+  request.send ( jsonBody );
+  
+}
+</script>

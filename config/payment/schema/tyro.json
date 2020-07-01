@@ -1,0 +1,24 @@
+{
+    "properties": {
+        "environment": {
+            "type": "string",
+            "enum": ["TEST", "PROD"]
+        },
+        "paymentType": {
+            "type": "string"
+        },
+        "merchantId": {
+            "type": "string"
+        },
+        "apiPassword": {
+            "type": "string"
+        }
+    },
+    "required": [
+        "environment",
+        "apiPassword",
+        "publicKey",
+        "merchantId"
+    ],
+    "additionalProperties": false
+}

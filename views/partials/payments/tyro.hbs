@@ -1,0 +1,50 @@
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+<script src="https://test-tyro.mtf.gateway.mastercard.com/checkout/version/55/checkout.js"
+                data-error="errorCallback"
+                data-cancel="cancelCallback">
+        </script>
+
+        <script type="text/javascript">
+
+
+            function errorCallback(error) {
+                  console.log(JSON.stringify(error));
+            }
+            function cancelCallback() {
+                  console.log('Payment cancelled');
+            }
+
+            Checkout.configure({
+                merchant: 'TYRO_318',
+                order: {
+                    amount: {{@root.session.totalCartAmount}},
+                    currency: 'AUD',
+                    description: 'Get description',
+                    id: Date.now()
+             },
+                interaction: {
+                    operation: 'PURCHASE', // set this field to 'PURCHASE' for Hosted Checkout to perform a Pay Operation.
+                    merchant: {
+                        name: 'CLOTH'
+                       
+                    }
+                                                                }
+            });
+
+        </script>
+
+
+<script type="text/javascript" src="https://www.draw.io/js/viewer.min.js"></script>
+<script type="text/javascript"
+        src="https://www.simplify.com/commerce/simplify.pay.js"></script>
+<div>Payment Operation</div>
+<select class="form-control" id="Payment-operation">
+    <option value="PURCHASE">PAY</option>
+    <option value="AUTHORIZE">AUTHORISE</option>
+   
+</select>
+
+<center><p><button type="button" onclick="Checkout.showLightbox();" class="btn btn-danger btn-lg">Hosted LightBox</button></p></center>
+<center><p><button type="button" onclick="Checkout.showPaymentPage();"; class="btn btn-warning btn-lg">Hosted Payment Page</button></p></center>
