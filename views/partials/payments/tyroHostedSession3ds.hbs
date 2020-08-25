@@ -131,52 +131,16 @@ console.log('im runnnnning');
 }
 
 //3DS STEP 3
-function do3dsStepThree(){
-var optionalParams = {
-    fullScreenRedirect: true,
-    billing: {
-        address: {
-            city: "London",
-            country: "GBR"
-        }
-    }
-};
- 
-ThreeDS.authenticatePayer({orderId}, {transactionId}, function (data) {
-    if (!data.error) {
-        //data.response will contain all the response payload from the AUTHENTICATE_PAYER call.
-        console.log("REST API response ", data.restApiResponse);
-        console.log("HTML redirect code", data.htmlRedirectCode);
-        displayReceipt(data);
-    }
-}, optionalParams);
- 
- 
-function displayReceipt(apiResponse) {
-    var responseBody = {
-        "apiResponse": apiResponse
-    };
- 
-    var xhr = new XMLHttpRequest();
-    xhr.open('PUT', '3dsreceipt', true);
-    xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.onreadystatechange = function () {
-        if (xhr.readyState == XMLHttpRequest.DONE) {
-            document.documentElement.innerHTML = this.response;
-        }
-    }
-    xhr.send(JSON.stringify(responseBody));
-}
 
-//3DS Step 4
-function do3dsStepFour(){
+function do3dsStepThree(){
 var optionalParams = {
     sourceOfFunds: {
         type: "CARD"
     }
 };
 
-ThreeDS.initiateAuthentication({orderId}, {transactionId}, function (data) {
+
+ThreeDS.initiateAuthentication({"13564684"}, {"5435435435643568436"}, function (data) {
     if (data && data.error) {
         var error = data.error;
 
@@ -206,6 +170,46 @@ ThreeDS.initiateAuthentication({orderId}, {transactionId}, function (data) {
     }
 }, optionalParams);
 
+}
+
+//3DS Step 4
+
+function do3dsStepFour(){
+var optionalParams = {
+    fullScreenRedirect: true,
+    billing: {
+        address: {
+            city: "London",
+            country: "GBR"
+        }
+    }
+};
+ 
+ThreeDS.authenticatePayer({"13564684"}, {"5435435435643568436"}, function (data) {
+    if (!data.error) {
+        //data.response will contain all the response payload from the AUTHENTICATE_PAYER call.
+        console.log("REST API response ", data.restApiResponse);
+        console.log("HTML redirect code", data.htmlRedirectCode);
+        displayReceipt(data);
+    }
+}, optionalParams);
+ 
+ 
+function displayReceipt(apiResponse) {
+    var responseBody = {
+        "apiResponse": apiResponse
+    };
+ 
+    var xhr = new XMLHttpRequest();
+    xhr.open('PUT', '3dsreceipt', true);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState == XMLHttpRequest.DONE) {
+            document.documentElement.innerHTML = this.response;
+        }
+    }
+    xhr.send(JSON.stringify(responseBody));
+}
 }
 
 //Hosted session implementation
