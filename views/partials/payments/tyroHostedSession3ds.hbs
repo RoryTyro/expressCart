@@ -1,0 +1,367 @@
+
+
+<script src="https://test-tyro.mtf.gateway.mastercard.com/form/version/57/merchant/TYRO_318/session.js"></script>
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+<script src="https://test-tyro.mtf.gateway.mastercard.com/static/threeDS/1.3.0/three-ds.min.js"
+            data-error="errorCallback"
+            data-cancel="cancelCallback">
+</script>
+
+<!-- CREATE THE HTML FOR THE PAYMENT PAGE -->
+
+
+</style>
+</head>
+
+
+<!-- CREATE THE HTML FOR THE PAYMENT PAGE -->
+        <div id="3DSUI"></div>
+                        <div class="form-group">
+                            <label for="cc-number" class="control-label mb-1">Card number</label>
+                         
+                            <input  type="tel" pattern="[0-9\s]{13,19}" autocomplete="cc-number" id="card-number" class="input-field cc-number form-control invalidFieldCharacters" title="card number" aria-label="enter your card number" value="" tabindex="1" readonly>
+                            <div id="card-invalid" class="d-none" role="alert">
+                                    Please enter a valid card
+                            </div>
+                        </div>
+                        <div class="form-group has-success">
+                            <label for="cc-name" class="control-label mb-1">Name on card</label>
+                            <input type="text" id="cardholder-name" class="input-field form-control cc-name" title="cardholder name" aria-label="enter name on card"  tabindex="3" readonly>
+
+                        </div>
+
+                        <div>Expiry Month 
+                                <select id="expiry-month" class="form-control input-md" required="" readonly disabled>
+                                    <option value="">Select Month</option>
+                                    <option value="01">January</option>
+                                    <option value="02">February</option>
+                                    <option value="03">March</option>
+                                    <option value="04">April</option>
+                                    <option value="05">May</option>
+                                    <option value="06">June</option>
+                                    <option value="07">July</option>
+                                    <option value="08">August</option>
+                                    <option value="09">September</option>
+                                    <option value="10">October</option>
+                                    <option value="11">November</option>
+                                    <option value="12">December</option>
+                                </select>
+                                </div>
+
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                    
+                                        
+                            </div>
+
+                          </div>
+                          <div>Expiry Year 
+                                <select id="expiry-year" class="form-control input-md" required="" readonly disabled>
+                                    <option value="">Select Year</option>
+                                    <option>20</option>
+                                    <option>21</option>
+                                    <option>22</option>
+                                    <option>23</option>
+                                    <option>24</option>
+                                    <option>25</option>
+                                    <option>26</option>
+                                    <option>27</option>
+                                    <option>28</option>
+                                    <option>29</option>
+                                    <option>30</option>
+                                </select>
+                                </div>
+                        <div class="row">
+                            
+                            <div class="col-6">
+                                <label class="control-label mb-1">Security code</label>
+                                <div class="input-group">
+                                    <input type="text" id="security-code" class="input-field form-control cc-cvc" title="security code" aria-label="three digit CCV security code" value="" tabindex="4" readonly>
+                                    <div id="cvv-invalid" class="invisible" role="alert">
+                                            Please enter a valid CVV
+                                    </div>
+                                        </div>
+                                    </div>
+                                </div>
+               
+                        
+                        <div>
+                            <button id="payment-button" onclick="updateSession()" class="btn btn-lg btn-info btn-block">
+                                <i class="fa fa-lock fa-lg"></i>&nbsp;
+                                <span id="payment-button-amount">Pay</span>
+                            </button>
+                        </div>
+
+        
+<!-- JAVASCRIPT FRAME-BREAKER CODE TO PROVIDE PROTECTION AGAINST IFRAME CLICK-JACKING -->
+<script type="text/javascript">
+console.log('im runnnnning');
+
+
+//3DS STEP 2
+
+        //The output of this call will return 'false', since the API is not configured yet
+        console.log(ThreeDS.isConfigured());
+        /**
+        Configure method with the configuration{} parameter set and demonstrates the state change of the ThreeDS object before and after the configure method is invoked.
+        */
+
+        function do3dsStepTwo(sessionId) {
+        ThreeDS.configure({
+            merchantId: {"TYRO_318"},
+            sessionId: {sessionId},
+            containerId: "3DSUI",
+            callback: function () {
+                if (ThreeDS.isConfigured())
+                    console.log("Done with configure");
+            },
+            configuration: {
+                userLanguage: "en-AU", //Optional parameter
+                wsVersion: 57
+            }
+        });
+
+        //The output of this call will return 'true', since the API is configured
+        console.log(ThreeDS.isConfigured());
+
+        //The output of the following code might look like "ThreeDS JS API Version : 1.2.0"
+        console.log("ThreeDS JS API Version : " + ThreeDS.version);
+
+}
+
+//3DS STEP 3
+function do3dsStepThree(){
+var optionalParams = {
+    fullScreenRedirect: true,
+    billing: {
+        address: {
+            city: "London",
+            country: "GBR"
+        }
+    }
+};
+ 
+ThreeDS.authenticatePayer({orderId}, {transactionId}, function (data) {
+    if (!data.error) {
+        //data.response will contain all the response payload from the AUTHENTICATE_PAYER call.
+        console.log("REST API response ", data.restApiResponse);
+        console.log("HTML redirect code", data.htmlRedirectCode);
+        displayReceipt(data);
+    }
+}, optionalParams);
+ 
+ 
+function displayReceipt(apiResponse) {
+    var responseBody = {
+        "apiResponse": apiResponse
+    };
+ 
+    var xhr = new XMLHttpRequest();
+    xhr.open('PUT', '3dsreceipt', true);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState == XMLHttpRequest.DONE) {
+            document.documentElement.innerHTML = this.response;
+        }
+    }
+    xhr.send(JSON.stringify(responseBody));
+}
+
+//3DS Step 4
+function do3dsStepFour(){
+var optionalParams = {
+    sourceOfFunds: {
+        type: "CARD"
+    }
+};
+
+ThreeDS.initiateAuthentication({orderId}, {transactionId}, function (data) {
+    if (data && data.error) {
+        var error = data.error;
+
+        //Something bad happened, the error value will match what is returned by the Authentication API
+        console.error("error.code : ", error.code);
+        console.error("error.msg : ", error.msg);
+        console.error("error.result : ", error.result);
+        console.error("error.status : ", error.status);
+    } else {
+        console.log("After Initiate 3DS ", data);
+
+        //data.response will contain information like gatewayRecommendation, authentication version, etc.
+        console.log("REST API raw response ", data.restApiResponse);
+        console.log("Correlation Id", data.correlationId);
+        console.log("Gateway Recommendation", data.gatewayRecommendation);
+        console.log("HTML Redirect Code", data.htmlRedirectCode);
+        console.log("Authentication Version", data.authenticationVersion);
+
+        switch (data.gatewayRecommendation) {
+            case "PROCEED":
+                authenticatePayer();//merchant's method
+                break;
+            case "DO_NOT_PROCEED":
+                displayReceipt(data);//merchant's method, you can offer the payer the option to try another payment method.
+                break;
+        }
+    }
+}, optionalParams);
+
+}
+
+//Hosted session implementation
+
+var sessions = [];
+
+
+  PaymentSession.configure({
+ 
+    fields: {
+          // ATTACH HOSTED FIELDS TO YOUR PAYMENT PAGE FOR A CREDIT CARD
+          card: {
+            number: "#card-number"
+
+          }
+        },
+        frameEmbeddingMitigation: ["javascript"],
+        callbacks: {
+ 		initialized: function(response) {
+         // HANDLE INITIALIZATION RESPONSE
+         console.log("configuration ran");
+ },
+ formSessionUpdate: function(response) {
+         console.log("card-number update: " + JSON.stringify(response));
+	// HANDLE RESPONSE FOR UPDATE SESSION
+ 	if (response.status) {
+   	if ("ok" == response.status) {
+        console.log("Session updated with data: " + response.session.id);
+        var sessionId = response.session.id;
+
+         if (response.sourceOfFunds.provided.card.number) {
+         console.log("valid card was provided.");
+         document.getElementById("card-invalid").setAttribute("class", "d-none");
+         configureDateAndCvv(sessionId);
+         }
+         if (response.sourceOfFunds.provided.card.number) {
+         console.log("valid card was provided.");
+         
+         
+        }
+		//check if the user entered a Mastercard credit card
+		if (response.sourceOfFunds.provided.card.scheme == 'MASTERCARD') {
+        console.log("The user entered a Mastercard credit card.")
+        document.getElementById("card-number").setAttribute("class", "form-control cc-number identified mastercard border-success");
+       }
+       if (response.sourceOfFunds.provided.card.scheme == 'VISA') {
+        console.log("The user entered a Mastercard credit card.")
+        document.getElementById("card-number").setAttribute("class", "form-control cc-number identified visa border-success");
+       }
+       if (response.sourceOfFunds.provided.card.scheme == 'AMEX') {
+        console.log("The user entered a Mastercard credit card.")
+        document.getElementById("card-number").setAttribute("class", "form-control cc-number identified amex border-success");
+       }
+        } else if ("fields_in_error" == response.status)  {
+                 console.log("Session update failed with field errors.");
+                 if (response.errors.cardNumber) {
+                 console.log("Card number invalid or missing.");
+                 document.getElementById("card-invalid").setAttribute("class", "alert alert-danger");
+                 document.getElementById("card-number").setAttribute("class", "form-control cc-number");
+                  }
+    } 
+    }
+}
+},
+interaction: {
+        displayControl: {
+            formatCard: "EMBOSSED",
+            invalidFieldCharacters: "REJECT"
+			 }
+ 		}
+  },"card-number");
+
+  function configureDateAndCvv(sessionId){
+    document.getElementById("expiry-month").removeAttribute("disabled");
+    document.getElementById("expiry-year").removeAttribute("disabled");
+    PaymentSession.configure({
+        session: sessionId,
+        fields: {
+          // ATTACH HOSTED FIELDS TO YOUR PAYMENT PAGE FOR A CREDIT CARD
+          
+          card: {
+    securityCode: "#security-code",
+      expiryMonth: "#expiry-month",
+      expiryYear: "#expiry-year",
+      nameOnCard: "#cardholder-name"
+          }
+        },
+        frameEmbeddingMitigation: ["javascript"],
+        callbacks: {
+ 		initialized: function(response) {
+         // HANDLE INITIALIZATION RESPONSE
+         console.log("cvv and date configuration ran");
+ },
+ formSessionUpdate: function(response){
+     var response = response;
+     dateAndCvvResponse(response); 
+    }
+},
+interaction: {
+        displayControl: {
+            formatCard: "EMBOSSED",
+            invalidFieldCharacters: "REJECT"
+			 }
+ 		}
+  }, "cvv-date");
+  }
+
+  function dateAndCvvResponse(response) {
+         console.log("cvv response: " + JSON.stringify(response));
+	// HANDLE RESPONSE FOR UPDATE SESSION
+ 	if (response.status) {
+   	if ("ok" == response.status) {
+        console.log("Session updated with data: " + response.session.id);
+        var sessionId = response.session.id;
+
+        do3dsStepTwo(sessionId);
+        //pay(sessionId);
+         
+        }
+    }
+}
+
+
+PaymentSession.onBlur(['card.number'], function() {
+     console.log("card.number field changed");
+
+    PaymentSession.updateSessionFromForm("card", undefined,'card-number');
+    //handle change event
+});
+
+function updateSession() {
+// UPDATE THE SESSION WITH THE INPUT FROM HOSTED FIELDS
+//PaymentSession.updateSessionFromForm('card', undefined,"card-number");
+
+PaymentSession.updateSessionFromForm('card', undefined,"cvv-date");
+
+
+
+}
+
+
+
+
+function pay(sessionId){
+    var request = new XMLHttpRequest();
+    request.onreadystatechange = function() {
+       
+        if (request.readyState === XMLHttpRequest.DONE && request.status == 200) {
+        window.location.assign(request.responseURL);
+    }
+    }
+  var path = "/tyroHostedSession/checkout_action"; 
+  request.open("POST", path, true);
+  request.setRequestHeader("Content-Type", "application/json; charset=UTF-8");
+  var jsonBody= '{"sessionId":"' + sessionId + '"}';
+  request.send ( jsonBody );
+  
+}
+</script>

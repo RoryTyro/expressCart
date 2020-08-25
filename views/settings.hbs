@@ -46,6 +46,7 @@
                     <option {{selectState 'tyroHostedSessionIsv' config.paymentGateway}} value="tyroHostedSessionIsv">Tyro Hosted Checkout Isv</option>
                     <option {{selectState 'tyroHostedCheckoutIsv' config.paymentGateway}} value="tyroHostedCheckoutIsv">Tyro Hosted Checkout Isv</option>
                     <option {{selectState 'tyroHostedCheckoutTokens' config.paymentGateway}} value="tyroHostedCheckoutTokens">Tyro Hosted Checkout Tokens</option>
+                    <option {{selectState 'tyroHostedCheckout3ds' config.paymentGateway}} value="tyroHostedCheckout3ds">Tyro Hosted Session 3DS</option>
                 </select>
                 <p class="help-block">{{ @root.__ "Payment_Gateway_Info" }}</p>
             </div>
