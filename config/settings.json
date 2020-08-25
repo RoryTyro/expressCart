@@ -17,7 +17,7 @@
     "customCss": "",
     "currencySymbol": "$",
     "paymentGateway": "tyroHostedSession",
-    "databaseConnectionString": "mongodb://127.0.0.1:27017/expresscart",
+    "databaseConnectionString": "mongodb+srv://webStoreUser:Fs7Gd1iIm1vsSZDi@cluster0.ef3ik.mongodb.net/expresscart-test?retryWrites=true&w=majority",
     "theme": "Cloth",
     "trackStock": false,
     "orderHook": "",
