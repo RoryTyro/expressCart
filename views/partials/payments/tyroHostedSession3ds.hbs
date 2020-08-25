@@ -127,7 +127,7 @@ console.log('im runnnnning');
 
         //The output of the following code might look like "ThreeDS JS API Version : 1.2.0"
         console.log("ThreeDS JS API Version : " + ThreeDS.version);
-
+do3dsStepThree();
 }
 
 //3DS STEP 3
@@ -161,7 +161,7 @@ ThreeDS.initiateAuthentication("13564684", "5435435435643568436", function (data
 
         switch (data.gatewayRecommendation) {
             case "PROCEED":
-                authenticatePayer();//merchant's method
+                do3dsStepFour();//merchant's method
                 break;
             case "DO_NOT_PROCEED":
                 displayReceipt(data);//merchant's method, you can offer the payer the option to try another payment method.
